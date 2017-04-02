@@ -8,3 +8,10 @@ For now the you can look at the tests for examples.
 
 
 This is my first open source project, I will gladly accept any advice you can give me :).
+
+
+TODO
+-----
+
+* Test tt
+* Test multiple key actions on failure because invalid keys
