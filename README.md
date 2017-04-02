@@ -15,3 +15,4 @@ TODO
 
 * Test ttl
 * ~~Test multiple key actions on failure because invalid keys~~
+* Find out why keys using "\n\t\f" in double quoted php strings work and don't throw exception
