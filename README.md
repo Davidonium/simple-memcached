@@ -14,4 +14,4 @@ TODO
 -----
 
 * Test ttl
-* Test multiple key actions on failure because invalid keys
+* ~~Test multiple key actions on failure because invalid keys~~
