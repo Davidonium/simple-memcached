@@ -13,5 +13,5 @@ This is my first open source project, I will gladly accept any advice you can gi
 TODO
 -----
 
-* Test tt
+* Test ttl
 * Test multiple key actions on failure because invalid keys
