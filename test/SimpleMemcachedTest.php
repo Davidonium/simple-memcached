@@ -15,7 +15,7 @@ class SimpleMemcachedTest extends TestCase
     public function setUp()
     {
         $memcached = new Memcached();
-        $memcached->addServer('localhost', '11211');
+        $memcached->addServer(getenv('MEMCACHED_HOST'), getenv('MEMCACHED_PORT'));
         $this->cache = new SimpleMemcached($memcached);
         $this->cache->clear();
     }
