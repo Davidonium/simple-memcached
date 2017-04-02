@@ -146,7 +146,8 @@ class SimpleMemcached implements CacheInterface
     }
 
     /**
-     * @param $keys
+     * Normalizes keys to array and validates every key
+     * @param array|Traversable $keys
      * @return array
      * @throws InvalidKeyException
      */
