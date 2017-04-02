@@ -34,6 +34,30 @@ class SimpleMemcachedTest extends TestCase
         ];
     }
 
+    public function dataWithInvalidKeysProvider()
+    {
+        $invalidLongKey = str_repeat("abcdefghij", 26);
+        return [
+            [[
+                'lorem
+                ' => 'ipsum',
+                 'dolor ' => 'sit',
+                 'amet' => 'consectetur'
+            ]],
+            [[
+                $invalidLongKey => 'ipsum',
+                'dolor' => 'sit',
+                'am et' => 'consectetur'
+            ]],
+            [[
+                $invalidLongKey => 'ipsum',
+                'dolo r' => 'sit',
+                'am
+                et' => 'consectetur'
+            ]],
+        ];
+    }
+
     public function testSuccessSetSingle()
     {
         $res = $this->cache->set('lorem', 'ipsum');
@@ -70,11 +94,35 @@ class SimpleMemcachedTest extends TestCase
 
     }
 
+    /**
+     * @param $invalidKey
+     * @dataProvider invalidKeyProvider
+     */
+    public function testInvalidKeyGetSingle($invalidKey)
+    {
+        $this->expectException(InvalidKeyException::class);
+
+        $res = $this->cache->get($invalidKey, 'ipsum');
+        $this->assertFalse($res, sprintf("The key %s should fail to be used", $invalidKey));
+
+    }
+
     public function testSuccessHas()
     {
         $this->cache->set('lorem', 'ipsum');
         $this->assertTrue($this->cache->has('lorem'));
         $this->assertFalse($this->cache->has('notfound'));
+    }
+
+   /**
+    * @param $invalidKey
+    * @dataProvider invalidKeyProvider
+    */
+    public function testInvalidKeyHas($invalidKey)
+    {
+        $this->expectException(InvalidKeyException::class);
+
+        $res = $this->cache->has($invalidKey);
     }
 
     public function testSuccessDeleteSingle()
@@ -85,6 +133,17 @@ class SimpleMemcachedTest extends TestCase
         $this->assertTrue($res);
 
         $this->assertNull($this->cache->get('lorem'));
+    }
+
+    /**
+     * @param $invalidKey
+     * @dataProvider invalidKeyProvider
+     */
+    public function testInvalidKeyDeleteSingle($invalidKey)
+    {
+        $this->expectException(InvalidKeyException::class);
+
+        $this->cache->delete($invalidKey);
     }
 
     public function testSuccessClear()
@@ -115,6 +174,16 @@ class SimpleMemcachedTest extends TestCase
 
     }
 
+    /**
+     * @param $invalidData
+     * @dataProvider dataWithInvalidKeysProvider
+     */
+    public function testInvalidKeySetMultiple($invalidData)
+    {
+        $this->expectException(InvalidKeyException::class);
+        $this->cache->setMultiple($invalidData);
+    }
+
     public function testSuccessGetMultiple()
     {
         $testData = [
@@ -130,6 +199,16 @@ class SimpleMemcachedTest extends TestCase
         foreach ($items as $key => $item) {
             $this->assertEquals($item, $testData[$key]);
         }
+    }
+
+    /**
+     * @param $invalidData
+     * @dataProvider dataWithInvalidKeysProvider
+     */
+    public function testInvalidKeyGetMultiple($invalidData)
+    {
+        $this->expectException(InvalidKeyException::class);
+        $this->cache->getMultiple(array_keys($invalidData));
     }
 
     public function testSuccessDeleteMultiple()
@@ -149,5 +228,15 @@ class SimpleMemcachedTest extends TestCase
         foreach ($items as $key => $item) {
             $this->assertNull($item);
         }
+    }
+
+    /**
+     * @param $invalidData
+     * @dataProvider dataWithInvalidKeysProvider
+     */
+    public function testInvalidKeyDeleteMultiple($invalidData)
+    {
+        $this->expectException(InvalidKeyException::class);
+        $this->cache->deleteMultiple(array_keys($invalidData));
     }
 }
