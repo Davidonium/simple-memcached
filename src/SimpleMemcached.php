@@ -31,9 +31,11 @@ class SimpleMemcached implements CacheInterface
     public function get($key, $default = null)
     {
         $item = $this->memcached->get($key);
-        $this->checkKey($key);
-        if ($this->memcached->getResultCode() === Memcached::RES_NOTFOUND) {
-            $item = $default;
+        if (!$item) {
+            $this->checkKey($key);
+            if ($this->memcached->getResultCode() === Memcached::RES_NOTFOUND) {
+                $item = $default;
+            }
         }
 
         return $item;
@@ -46,7 +48,9 @@ class SimpleMemcached implements CacheInterface
     {
         $ttl = $this->formatTtl($ttl);
         $result = $this->memcached->set($key, $value, $ttl);
-        $this->checkKey($key);
+        if (!$result) {
+            $this->checkKey($key);
+        }
 
         return $result;
     }
@@ -57,7 +61,10 @@ class SimpleMemcached implements CacheInterface
     public function delete($key)
     {
         $result = $this->memcached->delete($key);
-        $this->checkKey($key);
+        if (!$result) {
+            $this->checkKey($key);
+        }
+
         return $result;
     }
 
