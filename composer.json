@@ -3,6 +3,12 @@
     "type": "library",
     "license": "MIT",
     "version": "0.0.1",
+    "keywords":    [
+        "cache",
+        "psr16",
+        "memcached"
+    ],
+    "homepage": "https://github.com/davidonium/simple-memcached",
     "authors": [
         {
             "name": "David Hernando Jurado",
