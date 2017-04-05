@@ -32,8 +32,9 @@ class SimpleMemcached implements CacheInterface
     {
         $item = $this->memcached->get($key);
         if ($item === false) {
-            $this->checkKey($key);
-            if ($this->memcached->getResultCode() === Memcached::RES_NOTFOUND) {
+            $resultCode = $this->memcached->getResultCode();
+            $this->checkKey($resultCode, $key);
+            if ($resultCode === Memcached::RES_NOTFOUND) {
                 $item = $default;
             }
         }
@@ -49,7 +50,7 @@ class SimpleMemcached implements CacheInterface
         $ttl = $this->formatTtl($ttl);
         $result = $this->memcached->set($key, $value, $ttl);
         if ($result === false) {
-            $this->checkKey($key);
+            $this->checkKey($this->memcached->getResultCode(), $key);
         }
 
         return $result;
@@ -62,7 +63,7 @@ class SimpleMemcached implements CacheInterface
     {
         $result = $this->memcached->delete($key);
         if ($result === false) {
-            $this->checkKey($key);
+            $this->checkKey($this->memcached->getResultCode(), $key);
         }
 
         return $result;
@@ -129,8 +130,14 @@ class SimpleMemcached implements CacheInterface
      */
     public function has($key)
     {
-        $this->get($key);
-        return $this->memcached->getResultCode() !== Memcached::RES_NOTFOUND;
+        $result = $this->get($key);
+
+        $resultCode = $this->memcached->getResultCode();
+        if  ($result === false) {
+            $this->checkKey($resultCode, $key);
+        }
+
+        return $resultCode !== Memcached::RES_NOTFOUND;
     }
 
     /**
@@ -191,12 +198,13 @@ class SimpleMemcached implements CacheInterface
 
     /**
      * Checks the result of memcached for a bad key provided, this must be used after a memcached operation
+     * @param int $resultCode
      * @param string $key
      * @throws InvalidKeyException
      */
-    private function checkKey($key)
+    private function checkKey($resultCode, $key)
     {
-        if ($this->memcached->getResultCode() === Memcached::RES_BAD_KEY_PROVIDED) {
+        if ($resultCode === Memcached::RES_BAD_KEY_PROVIDED) {
             throw new InvalidKeyException(sprintf('Invalid key %s provided, Message: %s', $key, $this->memcached->getResultMessage()));
         }
     }
